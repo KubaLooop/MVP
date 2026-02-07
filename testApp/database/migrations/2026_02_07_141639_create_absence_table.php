@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('googleCalendarID')->nullable(); // Rdy pro google API
 
             $table->timestamps();
-            //Pridat indexy?
+            
         });
     }
 

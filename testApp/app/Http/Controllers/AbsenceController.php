@@ -17,6 +17,7 @@ class AbsenceController extends Controller
         protected AbsenceService $service
     ) {}
 
+    // Ukladani nove zadosti
     public function store(Request $request)
     {
         // Validace
@@ -24,22 +25,21 @@ class AbsenceController extends Controller
             'type' => ['required', new Enum(AbsenceType::class)],
             'dateFrom' => ['required', 'date'],
             'dateTo' => ['required', 'date', 'after_or_equal:dateFrom'],
-            'hours' => ['nullable', 'numeric', 'min:0.5', 'max:8'], // Jen pro jednodenní
+            'hours' => ['nullable', 'numeric'],
         ]);
 
         // Pouziti AbsenceService
         $absence = $this->service->createRequest($request->user(), $validated);
 
-        // Zpetna vazba / pripadne bude view
+        // Zpetna vazba - pro jednoduchost jen JSON
         return response()->json([
             'message' => 'Žádost byla vytvořena',
             'data' => $absence
         ], 201);
     }
+    // Schvaleni (od mng)
     public function approve(Request $request, Absence $absence)
     {
-        // Check if user is manager - TODO: middleware
-
         try {
             $approvedAbsence = $this->service->approveRequest($absence, $request->user());
             
@@ -52,7 +52,7 @@ class AbsenceController extends Controller
         }
     }
 
-
+    // Zamitnuti (od mng)
     public function reject(Request $request, Absence $absence)
     {
 
@@ -67,6 +67,7 @@ class AbsenceController extends Controller
         ]);
     }
 
+    // Uprava zadosti
     public function update(Request $request, Absence $absence)
     {
         $validated = $request->validate([
@@ -81,9 +82,26 @@ class AbsenceController extends Controller
         return response()->json(['message' => 'Upraveno', 'data' => $updatedAbsence]);
     }
 
+    // Zruseni
     public function cancel(Request $request, Absence $absence)
     {
         $this->service->cancelRequest($absence);
         return response()->json(['message' => 'Zrušeno']);
+    }
+
+    public function export(Request $request)
+    {
+        // Validace
+        $request->validate([
+            'year' => 'required|integer|min:2020|max:2030', // Rozumny rozsah
+            'month' => 'required|integer|min:1|max:12',
+        ]);
+
+        $data = $this->service->getMonthlyReport(
+            $request->input('year'), 
+            $request->input('month')
+        );
+
+        return response()->json($data);
     }
 }

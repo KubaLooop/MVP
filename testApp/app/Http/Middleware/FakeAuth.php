@@ -12,7 +12,7 @@ class FakeAuth
     public function handle(Request $request, Closure $next)
     {
         // Přečteme ID uživatele z hlavičky 'X-User-ID'
-        // Pokud tam není, vezmeme natvrdo ID 1 (Pepa)
+        // Pokud tam není, vezmeme natvrdo ID 1
         $userId = $request->header('X-User-ID', 1);
 
         $user = User::find($userId);

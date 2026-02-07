@@ -108,5 +108,44 @@ class AbsenceService
         return $request;
         
     }
+    // Export mesice
+    public function getMonthlyReport(int $year, int $month): array
+    {
+        // Najdeme vsechny schvalene dny daneho mesice
+        $absences = Absence::where('status', AbsenceStatus::APPROVED)
+            ->where(function ($query) use ($year, $month) {
+                // Filtr intervalu
+                $startOfMonth = Carbon::create($year, $month, 1)->startOfDay();
+                $endOfMonth = Carbon::create($year, $month, 1)->endOfMonth()->endOfDay();
+                
+                $query->whereBetween('dateFrom', [$startOfMonth, $endOfMonth])
+                      ->orWhereBetween('dateTo', [$startOfMonth, $endOfMonth]);
+            })
+            ->with('user')
+            ->get();
+
+        $totalHours = 0;
+        $reportData = [];
+
+        foreach ($absences as $absence) {
+            // Z kazdeho zaznamu ulozime do reportu a secteme hodiny
+            
+            $reportData[] = [
+                'employee' => $absence->user->name,
+                'type' => $absence->type,
+                'from' => $absence->dateFrom->format('Y-m-d'),
+                'to' => $absence->dateTo->format('Y-m-d'),
+                'hours' => $absence->hours,
+            ];
+            
+            $totalHours += $absence->hours;
+        }
+
+        return [
+            'period' => "$month/$year",
+            'total_vacation_hours' => $totalHours,
+            'records' => $reportData
+        ];
+    }
 
 }

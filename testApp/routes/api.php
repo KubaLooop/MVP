@@ -12,6 +12,7 @@ Route::middleware(FakeAuth::class)->group(function () {
         Route::patch('/absences/{absence}/reject', [AbsenceController::class, 'reject']);
         Route::patch('/absences/{absence}/update', [AbsenceController::class, 'update']);
         Route::patch('/absences/{absence}/cancel', [AbsenceController::class, 'cancel']);
+        Route::get('/absences/export', [AbsenceController::class, 'export']);
     });
 
 });
