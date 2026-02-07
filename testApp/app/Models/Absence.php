@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Absence extends Model
 {
+    protected $table = 'absence';
     protected $fillable = [
         'userID', 'type', 'dateFrom', 'dateTo', 'hours', 'status', 'googleCalendarID'
     ];

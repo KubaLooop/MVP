@@ -11,7 +11,7 @@ enum AbsenceType: string
     public function label(): string {
         return match($this) {
             self::VACATION => 'Dovolená',
-            self::SICK => 'Nemoc',
+            self::SICK => 'Neschopenka',
             self::OCR => 'OČR',
         };
     }

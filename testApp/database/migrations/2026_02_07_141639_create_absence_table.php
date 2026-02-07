@@ -11,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('absence', function (Blueprint $table) { // Podle ER
             $table->id();
-            $table->foreignId('userID')->constrained()->onDelete('cascade');
+            $table->foreignId('userID')->constrained('users')->onDelete('cascade');
             $table->string('type');
             $table->date('dateFrom');
             $table->date('dateTo');
